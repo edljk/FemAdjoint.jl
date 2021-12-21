@@ -1,0 +1,13 @@
+name = "FemAdjoint"
+uuid = "e511a975-883c-40e3-9dc1-b41a629762cf"
+authors = ["Edouard <edouard.oudet@imag.fr> and contributors"]
+version = "0.1.0"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1"
+
+[targets]
+test = ["Test"]
