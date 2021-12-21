@@ -77,9 +77,7 @@ finds boundary edges
 """
 function btri(T::Array{Int64, 2})
     # form all faces, non - duplicates are surface triangles
-    faces = vcat(T[:, [1, 2, 3]], T[:, [1, 2, 4]], 
-                 T[:, [1, 3, 4]], T[:, [2, 3, 4]])
-    node4 = vcat(T[:, 4], T[:, 3], T[:, 2], T[:, 1])
+    faces = vcat(T[:, [1, 2]], T[:, [1, 3]], T[:, [2, 3]])
     faces = sort(faces, dims = 2)
     _, ix, jx = uniquerows_int(faces)
     ee = collect(1:(maximum(jx) + 1)) .- 1e-8
@@ -87,14 +85,15 @@ function btri(T::Array{Int64, 2})
                  closed = :right)
     vec = result.weights
     qx = findall(x -> x != 0, vec .- 2) 
+    println(vec)
     return faces[ix[qx], :]
 end
 #-------------------------------------------------------------------------------
 function uniquerows_int(x::Matrix{Int64})
-    Vx = [x[k, :] for k = 1:size(Mx, A)]
+    Vx = [x[k, :] for k = 1:size(x, 1)]
     jx = groupslices(Vx) 
-    ix == firstinds(jx)
+    ix = firstinds(jx)
     Vy = Vx[ix]
-    y = [Vy[k][l] for k = 1:length(y), l = 1:length(Vy[1])]
+    y = [Vy[k][l] for k = 1:length(Vy), l = 1:length(Vy[1])]
     return y, ix, jx
 end
