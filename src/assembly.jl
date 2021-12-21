@@ -90,10 +90,10 @@ function btri(T::Array{Int64, 2})
     return faces[ix[qx], :]
 end
 #-------------------------------------------------------------------------------
-uniqueidx(v) = unique(i -> v[i], eachindex(v))
 function uniquerows_int(x::Matrix{Int64})
     Vx = [x[k, :] for k = 1:size(Mx, A)]
-    ix = uniqueidx(Vx)
+    jx = groupslices(Vx) 
+    ix == firstinds(jx)
     Vy = Vx[ix]
     y = [Vy[k][l] for k = 1:length(y), l = 1:length(Vy[1])]
     return y, ix, jx

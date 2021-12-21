@@ -1,6 +1,6 @@
 module FemAdjoint
 
-using LinearAlgebra, StatsBase
+using LinearAlgebra, StatsBase, GroupSlices
 using ForwardDiff, SparseDiffTools, SparseArrays
 using JLD2
 
