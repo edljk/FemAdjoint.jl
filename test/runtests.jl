@@ -1,6 +1,6 @@
 #using FemAdjoint
 using Test, JLD2
-using ForwardDiff
+using LinearAlgebra, ForwardDiff, SparseArrays
 
 # load mesh and data for tests
 meshfile = "$(@__DIR__)/data/diskmesh.jld"
@@ -10,6 +10,11 @@ np, nt = size(p, 1), size(t, 1)
 u, v = 2 * rand(np) .- 1, 2 * rand(np) .- 1
 x, dp = p, 2 * rand(size(p)...) .- 1
 xp, xm = p .+ ε * dp, p .- ε * dp
+SK, SM = FemAdjoint.assembKM_P12D(p, t)
+IK, JK = FemAdjoint.indKM_sparse(t)
+IM, JM = FemAdjoint.indKM_sparse(t)
+K = sparse(IK, JK, SK, np, np)
+M = sparse(IM, JM, SM, np, np)
 
 @testset "mesh data" begin   
     @test size(p, 1) == 560
@@ -17,16 +22,12 @@ xp, xm = p .+ ε * dp, p .- ε * dp
 end
 
 @testset "first assembly" begin   
-    SK, SM = FemAdjoint.assembKM_P12D(p, t)
-    IK, JK = FemAdjoint.indKM_sparse(t)
-    IM, JM = FemAdjoint.indKM_sparse(t)
     @test length(IK) == length(JK)
     @test length(IK) == length(SK)
     @test length(IM) == length(JM)
     @test length(IM) == length(SM)
 end
-K = sparse(IK, JK, SK, np, np)
-M = sparse(IM, JM, SM, np, np)
+
 
 @testset "test eval function" begin   
     u, v = 2 * rand(np) .- 1, 2 * rand(np) .- 1
