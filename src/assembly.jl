@@ -26,7 +26,7 @@ end
 """
      SK, SM = assembKM_P12D(p, t)
 
-assemble the P1 stifness and mass matrices (eventually weighted).
+assemble the P1 stifness and mass matrices coefficients.
 """
 function assembKM_P12D(p, t)
     np, dim, nt = size(p, 1), size(p, 2), size(t, 1)
@@ -44,6 +44,26 @@ function assembKM_P12D(p, t)
     ad = 2 * aod    # diagonal element
     SM = vcat(aod, aod, aod, aod, aod, aod, ad, ad, ad)
     return SK, SM
+end
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-------------------------
+"""
+     nothing = assembK_P12D_standalone(p, t, S)
+
+assemble the P1 stifness matrice coefficients in place. Useful for SparseDiffTools.
+"""
+function assembK_P12D_inplace(p, t, S)
+    np, dim, nt = size(p, 1), size(p, 2), size(t, 1)
+    # compute ar add define arK and arM (not used ?)
+    ar = meshareas(p, t)
+    arK, arM = ar, ar
+    it1, it2, it3 = t[:, 1], t[:, 2], t[:, 3] 
+    g1x, g1y, g2x, g2y, g3x, g3y = pdetrg(p, t, ar)
+    c3 = (g1x .* g2x .+ g1y .* g2y) .* arK
+    c1 = (g2x .* g3x .+ g2y .* g3y) .* arK
+    c2 = (g3x .* g1x .+ g3y .* g1y) .* arK
+    SK = vcat(c3, c1, c2, c3, c1, c2, -c2 - c3, -c3 - c1, -c1 - c2)
+    copy!(S, SK)
+    return nothing
 end
 #-------------------------------------------------------------------------------
 """

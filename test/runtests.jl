@@ -1,6 +1,7 @@
 #using FemAdjoint
 using Test, JLD2
-using LinearAlgebra, ForwardDiff, SparseArrays, Arpack
+using LinearAlgebra, ForwardDiff, Arpack
+using SparseArrays, SparseDiffTools, SparsityDetection
 using UnicodePlots
 
 # load mesh and data for tests
@@ -68,3 +69,13 @@ u = reshape(U[:, 3], snp, snp)
 UnicodePlots.heatmap(u, xfact = .1, yfact = .1, xoffset = -1.5)
 #, colormap = :inferno)
 
+#-------------------------------------------------------------------------------
+y = similar(FemAdjoint.assembKM_P12D(p, t)[1])
+fs(y, x) = FemAdjoint.assembK_P12D_inplace(x, t, y)
+sparsity_pattern = jacobian_sparsity(fs, y, x[:])
+jac = Float64.(sparse(sparsity_pattern))
+colors = matrix_colors(jac)
+@time J = forwarddiff_color_jacobian!(jac, fs, x[:], colorvec = colors)
+@time J = forwarddiff_color_jacobian!(jac, fs, x[:], colorvec = colors)
+println(size(J))
+display(J)
