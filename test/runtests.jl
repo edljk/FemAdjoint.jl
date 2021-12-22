@@ -1,6 +1,7 @@
 #using FemAdjoint
 using Test, JLD2
-using LinearAlgebra, ForwardDiff, SparseArrays
+using LinearAlgebra, ForwardDiff, SparseArrays, Arpack
+using UnicodePlots
 
 # load mesh and data for tests
 meshfile = "$(@__DIR__)/data/diskmesh.jld"
@@ -37,10 +38,33 @@ end
 f = x -> FemAdjoint.costKproduv(x, t, u, v)
 fp, fm = f(xp), f(xm)
 @time g = ForwardDiff.gradient(f, x)
+@time g = ForwardDiff.gradient(f, x)
 
 @testset "test eval gradient dot function" begin 
     @test abs(dot(g, dp) - (fp - fm) / (2 * ε)) < 1e-4
 end
-
 display(K)
 println("directional derivative $(abs(dot(g, dp)))")
+
+#-------------------------------------------------------------------------------
+# square mesh 
+meshfile = "$(@__DIR__)/data/squaremesh.jld"
+JLD2.@load(meshfile, p, t)
+np, nt = size(p, 1), size(t, 1)
+SK, SM = FemAdjoint.assembKM_P12D(p, t)
+IK, JK = FemAdjoint.indKM_sparse(t)
+IM, JM = FemAdjoint.indKM_sparse(t)
+K = sparse(IK, JK, SK, np, np)
+M = sparse(IM, JM, SM, np, np)
+Ib = unique(FemAdjoint.btri(t)[:])
+K += sparse(Ib, Ib, fill(1e8, length(Ib)), np, np) # Dirichlet conditions
+
+λ, U = eigs(K, M, nev = 10, which = :SM, tol = 0., maxiter = 30_000)
+@testset "test eigenvalue" begin
+    @test abs(λ[1] - pi ^ 2 / 2) < 1e-2
+end
+snp = ceil(Int64, sqrt(size(p, 1)))
+u = reshape(U[:, 3], snp, snp)
+UnicodePlots.heatmap(u, xfact = .1, yfact = .1, xoffset = -1.5)
+#, colormap = :inferno)
+
