@@ -47,7 +47,7 @@ display(K)
 println("directional derivative $(abs(dot(g, dp)))")
 
 #-------------------------------------------------------------------------------
-# square mesh 
+# square mesh / eigenvalue test
 meshfile = "$(@__DIR__)/data/squaremesh.jld"
 JLD2.@load(meshfile, p, t)
 np, nt = size(p, 1), size(t, 1)

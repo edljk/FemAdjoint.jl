@@ -7,3 +7,20 @@
 [![Build Status](https://api.cirrus-ci.com/github/edljk/FemAdjoint.jl.svg)](https://cirrus-ci.com/github/edljk/FemAdjoint.jl)
 [![Coverage](https://codecov.io/gh/edljk/FemAdjoint.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/edljk/FemAdjoint.jl)
 [![Coverage](https://coveralls.io/repos/github/edljk/FemAdjoint.jl/badge.svg?branch=main)](https://coveralls.io/github/edljk/FemAdjoint.jl?branch=main)
+
+Designed to illustrate the use of `SparseDiffTools` approach in the context of a simple 
+ finite element cost function
+
+## Installation
+
+```julia
+import Pkg
+Pkg.clone("https://github.com/edljk/FemAdjoint.jl")
+```
+
+## Benchmark
+
+```julia
+using FemAdjoint
+>] test FemAdjoint
+```
