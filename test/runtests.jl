@@ -1,7 +1,7 @@
 #using FemAdjoint
 using Test, JLD2
 using LinearAlgebra, ForwardDiff, Arpack
-using SparseArrays, SparseDiffTools, SparsityDetection
+using SparseArrays, SparseDiffTools, Symbolics #SparsityDetection
 using UnicodePlots
 
 # load mesh and data for tests
@@ -65,17 +65,19 @@ K += sparse(Ib, Ib, fill(1e8, length(Ib)), np, np) # Dirichlet conditions
     @test abs(λ[1] - pi ^ 2 / 2) < 1e-2
 end
 snp = ceil(Int64, sqrt(size(p, 1)))
-u = reshape(U[:, 3], snp, snp)
-UnicodePlots.heatmap(u, xfact = .1, yfact = .1, xoffset = -1.5)
+u = reshape(U[:, 4], snp, snp)
+show(UnicodePlots.heatmap(u, xfact = 1 / (snp - 1), yfact = 1 / (snp - 1)))
+print("\n")
 #, colormap = :inferno)
 
 #-------------------------------------------------------------------------------
+p, t = ps, ts
 y = similar(FemAdjoint.assembKM_P12D(p, t)[1])
 fs(y, x) = FemAdjoint.assembK_P12D_inplace(x, t, y)
-sparsity_pattern = jacobian_sparsity(fs, x[:], y)
+@time sparsity_pattern = Symbolics.jacobian_sparsity(fs, y, p[:])
 jac = Float64.(sparse(sparsity_pattern))
 colors = matrix_colors(jac)
-@time J = forwarddiff_color_jacobian!(jac, fs, x[:], colorvec = colors)
-@time J = forwarddiff_color_jacobian!(jac, fs, x[:], colorvec = colors)
+@time J = forwarddiff_color_jacobian!(jac, fs, p[:], colorvec = colors)
+@time J = forwarddiff_color_jacobian!(jac, fs, p[:], colorvec = colors)
 println(size(J))
 display(J)
