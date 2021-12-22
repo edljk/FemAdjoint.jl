@@ -3,6 +3,7 @@ using Test, JLD2
 using LinearAlgebra, ForwardDiff, Arpack
 using SparseArrays, SparseDiffTools, Symbolics #SparsityDetection
 using UnicodePlots
+using FemAdjoint
 
 # load mesh and data for tests
 meshfile = "$(@__DIR__)/data/diskmesh.jld"
@@ -45,12 +46,13 @@ fp, fm = f(xp), f(xm)
     @test abs(dot(g, dp) - (fp - fm) / (2 * ε)) < 1e-4
 end
 display(K)
+print("\n")
 println("directional derivative $(abs(dot(g, dp)))")
 
 #-------------------------------------------------------------------------------
 # square mesh / eigenvalue test
 meshfile = "$(@__DIR__)/data/squaremesh.jld"
-JLD2.@load(meshfile, p, t)
+JLD2.@load(meshfile, p, t, ps, ts)
 np, nt = size(p, 1), size(t, 1)
 SK, SM = FemAdjoint.assembKM_P12D(p, t)
 IK, JK = FemAdjoint.indKM_sparse(t)
