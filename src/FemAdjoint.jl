@@ -1,7 +1,7 @@
 module FemAdjoint
 
 using LinearAlgebra, StatsBase, GroupSlices
-using ForwardDiff, SparseDiffTools, SparseArrays, SparsityDetection
+using ForwardDiff, SparseDiffTools, SparseArrays, Symbolics
 using JLD2, UnicodePlots
 
 include("assembly.jl")
