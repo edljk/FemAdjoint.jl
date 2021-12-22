@@ -11,7 +11,7 @@
 Designed to illustrate the use of `SparseDiffTools` approach in the context of a simple 
  finite element cost function
 
-## Installation
+## Install FemAdjoint
 
 ```julia
 import Pkg
