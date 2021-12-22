@@ -52,7 +52,7 @@ println("directional derivative $(abs(dot(g, dp)))")
 #-------------------------------------------------------------------------------
 # square mesh / eigenvalue test
 meshfile = "$(@__DIR__)/data/squaremesh.jld"
-JLD2.@load(meshfile, p, t, ps, ts)
+JLD2.@load(meshfile, p, t, jac, ps, ts, jacs)
 np, nt = size(p, 1), size(t, 1)
 SK, SM = FemAdjoint.assembKM_P12D(p, t)
 IK, JK = FemAdjoint.indKM_sparse(t)
@@ -73,13 +73,13 @@ print("\n")
 #, colormap = :inferno)
 
 #-------------------------------------------------------------------------------
-p, t = ps, ts
+#p, t, jac = ps, ts, jacs
 y = similar(FemAdjoint.assembKM_P12D(p, t)[1])
 fs(y, x) = FemAdjoint.assembK_P12D_inplace(x, t, y)
-@time sparsity_pattern = Symbolics.jacobian_sparsity(fs, y, p[:])
-jac = Float64.(sparse(sparsity_pattern))
+# to speedup test use a precomputed jac matrix
+#@time sparsity_pattern = Symbolics.jacobian_sparsity(fs, y, p[:])
+#jac = Float64.(sparse(sparsity_pattern))
 colors = matrix_colors(jac)
 @time J = forwarddiff_color_jacobian!(jac, fs, p[:], colorvec = colors)
 @time J = forwarddiff_color_jacobian!(jac, fs, p[:], colorvec = colors)
-println(size(J))
 display(J)
