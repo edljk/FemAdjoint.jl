@@ -1,8 +1,7 @@
 #using FemAdjoint
-using Test, JLD2
+using Test, JLD2, UnicodePlots
 using LinearAlgebra, ForwardDiff, Arpack
-using SparseArrays, SparseDiffTools, Symbolics #SparsityDetection
-using UnicodePlots
+using SparseArrays, SparseDiffTools, Symbolics 
 using FemAdjoint
 
 # load mesh and data for tests
