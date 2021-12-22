@@ -2,10 +2,10 @@ module FemAdjoint
 
 using LinearAlgebra, StatsBase, GroupSlices
 using ForwardDiff, SparseDiffTools, SparseArrays
-using JLD2
-
+using JLD2, UnicodePlots
 
 include("assembly.jl")
+include("plot.jl")
 
 function costKproduv(pin, t, u, v)
     p = if typeof(pin) <: Vector

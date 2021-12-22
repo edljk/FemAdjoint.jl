@@ -85,14 +85,16 @@ function btri(T::Array{Int64, 2})
                  closed = :right)
     vec = result.weights
     qx = findall(x -> x != 0, vec .- 2) 
-    println(vec)
     return faces[ix[qx], :]
 end
 #-------------------------------------------------------------------------------
 function uniquerows_int(x::Matrix{Int64})
     Vx = [x[k, :] for k = 1:size(x, 1)]
-    jx = groupslices(Vx) 
-    ix = firstinds(jx)
+    jj = groupslices(Vx) 
+    ix, jx = firstinds(jj), similar(jj)
+    for k = 1:length(ix)
+        jx[jj .== ix[k]] .= k 
+    end
     Vy = Vx[ix]
     y = [Vy[k][l] for k = 1:length(Vy), l = 1:length(Vy[1])]
     return y, ix, jx
