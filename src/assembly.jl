@@ -62,11 +62,6 @@ function assembK_P12D_inplace(p, t, S)
     c1 = (g2x .* g3x .+ g2y .* g3y) .* arK
     c2 = (g3x .* g1x .+ g3y .* g1y) .* arK
     SK = vcat(c3, c1, c2, c3, c1, c2, -c2 - c3, -c3 - c1, -c1 - c2)
-<<<<<<< Updated upstream
-=======
-    println(size(S))
-    println(size(SK))
->>>>>>> Stashed changes
     copy!(S, SK)
     return nothing
 end
