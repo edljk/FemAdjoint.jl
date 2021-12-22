@@ -51,7 +51,12 @@ end
 
 assemble the P1 stifness matrice coefficients in place. Useful for SparseDiffTools.
 """
-function assembK_P12D_inplace(p, t, S)
+function assembK_P12D_inplace(pin, t, S)
+    p = if typeof(pin) <: Vector 
+        reshape(pin, length(pin) ÷ 2, 2)
+    else
+        pin
+    end
     np, dim, nt = size(p, 1), size(p, 2), size(t, 1)
     # compute ar add define arK and arM (not used ?)
     ar = meshareas(p, t)

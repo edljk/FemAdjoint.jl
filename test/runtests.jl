@@ -72,7 +72,7 @@ UnicodePlots.heatmap(u, xfact = .1, yfact = .1, xoffset = -1.5)
 #-------------------------------------------------------------------------------
 y = similar(FemAdjoint.assembKM_P12D(p, t)[1])
 fs(y, x) = FemAdjoint.assembK_P12D_inplace(x, t, y)
-sparsity_pattern = jacobian_sparsity(fs, y, x[:])
+sparsity_pattern = jacobian_sparsity(fs, x[:], y)
 jac = Float64.(sparse(sparsity_pattern))
 colors = matrix_colors(jac)
 @time J = forwarddiff_color_jacobian!(jac, fs, x[:], colorvec = colors)
