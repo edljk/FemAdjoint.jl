@@ -21,17 +21,20 @@ function gensquaremesh(nx::Int64,  ny::Int64 = 50)
     return nothing
 end
 
-function genjac(meshfile::String = "/home/oudet/.julia/dev/FemAdjoint/test/data/diskmesh.jld2") 
+function genjac(meshfile::String = "diskmesh.jld2";
+                addstr::String = "")
+    meshfile = "/home/oudet/.julia/dev/FemAdjoint/test/data/" * meshfile 
     dictjld = FileIO.load(meshfile)
-    p, t = dictjld["p"], dictjld["t"]
-    if "jacK" ∉ keys(dictjld) # regen jac data
+    p, t = dictjld["p" * addstr], dictjld["t" * addstr]
+    if ("jacK" * addstr) ∉ keys(dictjld) # regen jac data
         y = similar(FemAdjoint.assembKM_P12D(p, t)[1])
         fs(y, x) = FemAdjoint.assembK_P12D_inplace(x, t, y)
         println("recompute sparsity pattern")
         @time sparsity_pattern = Symbolics.jacobian_sparsity(fs, y, p[:])
         jac = Float64.(sparse(sparsity_pattern))
-        dictjld["jacK"] = jac
+        dictjld["jacK" * addstr] = jac
         FileIO.save(meshfile, dictjld)
+        display(dictjld)
         println("end export sparsity pattern")
     end
     return nothing

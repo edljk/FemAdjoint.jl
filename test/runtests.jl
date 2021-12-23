@@ -51,7 +51,7 @@ println("directional derivative $(abs(dot(g, dp)))")
 #-------------------------------------------------------------------------------
 # square mesh / eigenvalue test
 meshfile = "$(@__DIR__)/data/squaremesh.jld2"
-JLD2.@load(meshfile, p, t, jac, ps, ts, jacs)
+JLD2.@load(meshfile, p, t, jacK, ps, ts, jacKs)
 np, nt = size(p, 1), size(t, 1)
 SK, SM = FemAdjoint.assembKM_P12D(p, t)
 IK, JK = FemAdjoint.indKM_sparse(t)
