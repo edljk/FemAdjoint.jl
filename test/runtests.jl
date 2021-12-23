@@ -5,7 +5,7 @@ using SparseArrays, SparseDiffTools, Symbolics
 using FemAdjoint
 
 # load mesh and data for tests
-meshfile = "$(@__DIR__)/data/diskmesh.jld"
+meshfile = "$(@__DIR__)/data/diskmesh.jld2"
 JLD2.@load(meshfile, p, t)
 np, nt = size(p, 1), size(t, 1)
 ε = 1e-5
@@ -50,7 +50,7 @@ println("directional derivative $(abs(dot(g, dp)))")
 
 #-------------------------------------------------------------------------------
 # square mesh / eigenvalue test
-meshfile = "$(@__DIR__)/data/squaremesh.jld"
+meshfile = "$(@__DIR__)/data/squaremesh.jld2"
 JLD2.@load(meshfile, p, t, jac, ps, ts, jacs)
 np, nt = size(p, 1), size(t, 1)
 SK, SM = FemAdjoint.assembKM_P12D(p, t)
