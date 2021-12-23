@@ -19,6 +19,7 @@ UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 [compat]
 Adapt = "3"
 ForwardDiff = "0.10"
+GroupSlices = "0.0.3"
 SparseDiffTools = "1"
 julia = "1"
 
