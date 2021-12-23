@@ -3,11 +3,6 @@
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://edljk.github.io/FemAdjoint.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://edljk.github.io/FemAdjoint.jl/dev)
 
-<script
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-  type="text/javascript">
-</script>
-
 
 Designed to illustrate the use of `SparseDiffTools` approach in the context of simple finite element cost functions.
 
