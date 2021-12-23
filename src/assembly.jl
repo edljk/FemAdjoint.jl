@@ -47,11 +47,11 @@ function assembKM_P12D(p, t)
 end
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-------------------------
 """
-     nothing = assembK_P12D_standalone(p, t, S)
+     nothing = assembK_P12D_inplace!(p, t, S)
 
 assemble the P1 stifness matrice coefficients in place. Useful for SparseDiffTools.
 """
-function assembK_P12D_inplace(pin, t, S)
+function assembK_P12D_inplace!(pin, t, S)
     p = if typeof(pin) <: Vector 
         reshape(pin, length(pin) ÷ 2, 2)
     else
@@ -68,6 +68,26 @@ function assembK_P12D_inplace(pin, t, S)
     c2 = (g3x .* g1x .+ g3y .* g1y) .* arK
     SK = vcat(c3, c1, c2, c3, c1, c2, -c2 - c3, -c3 - c1, -c1 - c2)
     copy!(S, SK)
+    return nothing
+end
+"""
+     nothing = assembM_P12D_inplace!(p, t, S)
+
+assemble the P1 mass matrice coefficients in place. Useful for SparseDiffTools.
+"""
+function assembM_P12D_inplace!(pin, t, S)
+    p = if typeof(pin) <: Vector 
+        reshape(pin, length(pin) ÷ 2, 2)
+    else
+        pin
+    end
+    np, dim, nt = size(p, 1), size(p, 2), size(t, 1)
+    # compute ar add define arK and arM (not used ?)
+    arM = meshareas(p, t)
+    aod = arM / 12. # off diagonal element
+    ad = 2 * aod    # diagonal element
+    SM = vcat(aod, aod, aod, aod, aod, aod, ad, ad, ad)
+    copy!(S, SM)
     return nothing
 end
 #-------------------------------------------------------------------------------

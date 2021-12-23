@@ -51,7 +51,7 @@ println("directional derivative $(abs(dot(g, dp)))")
 #-------------------------------------------------------------------------------
 # square mesh / eigenvalue test
 meshfile = "$(@__DIR__)/data/squaremesh.jld2"
-JLD2.@load(meshfile, p, t, jacK, ps, ts, jacKs)
+JLD2.@load(meshfile, p, t, jacK, jacM, ps, ts, jacKs, jacMs)
 np, nt = size(p, 1), size(t, 1)
 SK, SM = FemAdjoint.assembKM_P12D(p, t)
 IK, JK = FemAdjoint.indKM_sparse(t)
@@ -65,20 +65,29 @@ K += sparse(Ib, Ib, fill(1e8, length(Ib)), np, np) # Dirichlet conditions
 @testset "test eigenvalue" begin
     @test abs(λ[1] - pi ^ 2 / 2) < 1e-2
 end
-snp = ceil(Int64, sqrt(size(p, 1)))
-u = reshape(U[:, 4], snp, snp)
-show(UnicodePlots.heatmap(u, xfact = 1 / (snp - 1), yfact = 1 / (snp - 1)))
-print("\n")
-#, colormap = :inferno)
+# plot
+FemAdjoint.plotunicode(U[:, 4])
 
 #-------------------------------------------------------------------------------
 #p, t, jac = ps, ts, jacs
 y = similar(FemAdjoint.assembKM_P12D(p, t)[1])
-fs(y, x) = FemAdjoint.assembK_P12D_inplace(x, t, y)
+SK, SM = FemAdjoint.assembKM_P12D(p, t)
+SKi, SMi = similar(SK), similar(SM)
+FemAdjoint.assembK_P12D_inplace!(p, t, SKi)
+FemAdjoint.assembM_P12D_inplace!(p, t, SMi)
+@testset "test in place assemble" begin
+    @test maximum(abs.(SK .- SKi)) < 1e-8
+    @test maximum(abs.(SM .- SMi)) < 1e-8
+end
+fK(y, x) = FemAdjoint.assembK_P12D_inplace!(x, t, y)
 # to speedup test use a precomputed jac matrix
 #@time sparsity_pattern = Symbolics.jacobian_sparsity(fs, y, p[:])
-#jac = Float64.(sparse(sparsity_pattern))
-colors = matrix_colors(jac)
-@time J = forwarddiff_color_jacobian!(jac, fs, p[:], colorvec = colors)
-@time J = forwarddiff_color_jacobian!(jac, fs, p[:], colorvec = colors)
+#jacK = Float64.(sparse(sparsity_pattern))
+colors = matrix_colors(jacK)
+@time J = forwarddiff_color_jacobian!(jacK, fK, p[:], colorvec = colors)
+@time J = forwarddiff_color_jacobian!(jacK, fK, p[:], colorvec = colors)
 display(J)
+
+#-------------------------------------------------------------------------------
+# test adjoint approach for costnormU cost function
+#include("test_costnormU.jl")

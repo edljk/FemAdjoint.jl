@@ -28,14 +28,37 @@ function genjac(meshfile::String = "diskmesh.jld2";
     p, t = dictjld["p" * addstr], dictjld["t" * addstr]
     if ("jacK" * addstr) ∉ keys(dictjld) # regen jac data
         y = similar(FemAdjoint.assembKM_P12D(p, t)[1])
-        fs(y, x) = FemAdjoint.assembK_P12D_inplace(x, t, y)
-        println("recompute sparsity pattern")
-        @time sparsity_pattern = Symbolics.jacobian_sparsity(fs, y, p[:])
+        fK(y, x) = FemAdjoint.assembK_P12D_inplace!(x, t, y)
+        println("recompute sparsity pattern for K")
+        @time sparsity_pattern = Symbolics.jacobian_sparsity(fK, y, p[:])
         jac = Float64.(sparse(sparsity_pattern))
         dictjld["jacK" * addstr] = jac
         FileIO.save(meshfile, dictjld)
         display(dictjld)
         println("end export sparsity pattern")
     end
+    if ("jacM" * addstr) ∉ keys(dictjld) # regen jac data
+        y = similar(FemAdjoint.assembKM_P12D(p, t)[2])
+        fM(y, x) = FemAdjoint.assembM_P12D_inplace!(x, t, y)
+        println("recompute sparsity pattern for M")
+        @time sparsity_pattern = Symbolics.jacobian_sparsity(fM, y, p[:])
+        jac = Float64.(sparse(sparsity_pattern))
+        dictjld["jacM" * addstr] = jac
+        FileIO.save(meshfile, dictjld)
+        display(dictjld)
+        println("end export sparsity pattern")
+    end
     return nothing
+end
+
+function plotunicode(U::Vector{Float64})
+    np = length(U)
+    snp = ceil(Int64, sqrt(np))
+    u = reshape(U, snp, snp)
+    show(UnicodePlots.heatmap(u, xfact = 2 / (snp - 1), yfact = 2 / (snp - 1),
+                              xoffset = -1., yoffset = -1., 
+                              #, colormap = :inferno,
+                              width = 30, height = 30))
+    print("\n")
+    return nothing 
 end
