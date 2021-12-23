@@ -23,4 +23,44 @@ function costKproduv(pin, t, u, v)
     return val
 end
 
+function costnormU(pin, t)
+    p = if typeof(pin) <: Vector
+        reshape(pin, length(pin) ÷ 2, 2)
+    elseif typeof(pin) <: Matrix
+        pin
+    end
+    np = size(p, 1)
+    # assemble matrices
+    I, J = indKM_sparse(t)
+    SK, SM = FemAdjoint.assembKM_P12D(p, t)
+    K = sparse(IK, JK, SK, np, np)
+    M = sparse(IM, JM, SM, np, np)
+    F = M * ones(np)
+    U = K \ M
+    # cost 
+    val = sum(U[k] ^ 2 for k = 1:np)
+    return val
+end
+
+function ∇costnormU(pin, t)
+    p = if typeof(pin) <: Vector
+        reshape(pin, length(pin) ÷ 2, 2)
+    elseif typeof(pin) <: Matrix
+        pin
+    end
+    np = size(p, 1)
+    # assemble matrices
+    I, J = indKM_sparse(t)
+    SK, SM = FemAdjoint.assembKM_P12D(p, t)
+    K = sparse(IK, JK, SK, np, np)
+    M = sparse(IM, JM, SM, np, np)
+    F = M * ones(np)
+    U = K \ M
+    # gradient 
+    JFU = 2 * U 
+    H = - K \ JFU
+    val = sum(U[k] ^ 2 for k = 1:np)
+    return val
+end
+
 end # module
