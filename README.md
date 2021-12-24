@@ -12,8 +12,7 @@ Designed to illustrate the use of `SparseDiffTools` approach in the context of s
 ## Install FemAdjoint
 
 ```julia
-import Pkg
-Pkg.clone("https://github.com/edljk/FemAdjoint.jl")
+>] add https://github.com/edljk/FemAdjoint.jl
 ```
 
 ## Benchmark
