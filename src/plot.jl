@@ -56,7 +56,8 @@ function plotunicode(U::Vector{Float64};
     np = length(U)
     snp = ceil(Int64, sqrt(np))
     u = reshape(U, snp, snp)
-    show(UnicodePlots.heatmap(u, xfact = 2 / (snp - 1), yfact = 2 / (snp - 1),
+    show(UnicodePlots.heatmap(real.(u), xfact = 2 / (snp - 1), 
+                              yfact = 2 / (snp - 1),
                               xoffset = -1., yoffset = -1., 
                               colormap = colormap, title = title,
                               #, colormap = :inferno,
