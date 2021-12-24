@@ -51,7 +51,7 @@ function genjac(meshfile::String = "diskmesh.jld2";
     return nothing
 end
 
-function plotunicode(U::Vector{Float64};
+function plotunicode(U;
                      colormap::Symbol = :viridis, title::String = "")
     np = length(U)
     snp = ceil(Int64, sqrt(np))
