@@ -89,8 +89,8 @@ colors = matrix_colors(jacK)
 display(J)
 
 #-------------------------------------------------------------------------------
-# test adjoint approach for costnormU cost function
+# test adjoint approach for costKproduv cost function
 include("test_costKproduv.jl")
 #-------------------------------------------------------------------------------
 # test adjoint approach for costnormU cost function
-#include("test_costnormU.jl")
+include("test_costnormU.jl")

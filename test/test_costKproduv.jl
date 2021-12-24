@@ -5,7 +5,7 @@ using SparseArrays, SparseDiffTools, Symbolics
 # load mesh
 meshfile = "$(@__DIR__)/data/squaremesh.jld2"
 JLD2.@load(meshfile, p, t, jacK, jacM, ps, ts, jacKs, jacMs)
-#p, t, jacK, jacM =  ps, ts, jacKs, jacMs
+p, t, jacK, jacM =  ps, ts, jacKs, jacMs
 
 np, nt = size(p, 1), size(t, 1)
 ε = 1e-6

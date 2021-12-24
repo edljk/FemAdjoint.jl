@@ -22,8 +22,8 @@ println("")
 println(fp)
 println(fm)
 println(" ")
-println(dot(g, dp))
 println((fp - fm) / (2 * ε))
+println(dot(g, dp))
 println("")
 @testset "test eval gradient dot function for costnormU" begin 
     @test abs(dot(g, dp) - (fp - fm) / (2 * ε)) < 1e-4

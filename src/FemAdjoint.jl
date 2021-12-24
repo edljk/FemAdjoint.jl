@@ -6,7 +6,7 @@ using FileIO, JLD2, UnicodePlots
 
 include("assembly.jl")
 include("plot.jl")
-
+# different test cases
 include("costproduv.jl")
 #-------------------------------------------------------------------------------
 function costnormU(pin, t)
@@ -24,6 +24,7 @@ function costnormU(pin, t)
     K += sparse(Ib, Ib, fill(1e8, length(Ib)), np, np) # Dirichlet conditions
     M = sparse(I, J, SM, np, np)
     F = M * ones(np)
+    #F = ones(np)
     U = K \ F
     # L² cost 
     val = sum(U[k] ^ 2 for k = 1:np) / np
@@ -48,6 +49,7 @@ function ∇costnormU(pin, t;
     M = sparse(I, J, SM, np, np)
     # compute state function
     F = M * ones(np)
+    #F = ones(np)
     U = K \ F
     # plot
     plotunicode(U,  title = "U")
@@ -69,16 +71,14 @@ function ∇costnormU(pin, t;
     JK = forwarddiff_color_jacobian!(jacK, fK, p[:], colorvec = colorsK)
     colorsM = matrix_colors(jacM)
     JM = forwarddiff_color_jacobian!(jacM, fM, p[:], colorvec = colorsM)
-    # adjoint function
+    # cost gradient and adjoint function
     JFU = - 2 * U / np
     λ = K' \ JFU
     plotunicode(λ, colormap = :plasma, title = "λ")
     # compute full gradient 
     g = zeros(np, 2)
     for (i, j, s) ∈ zip(findnz(JK)...)
-        if I[i] != J[i] && I[i] ∉ Ib
-            g[j] += λ[J[i]] * s * U[I[i]]
-        end
+        g[j] += λ[J[i]] * s * U[I[i]]
     end
     for (i, j, s) ∈ zip(findnz(JM)...)
         g[j] -= λ[J[i]] * s 
