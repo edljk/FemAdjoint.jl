@@ -8,8 +8,10 @@ JLD2.@load(meshfile, p, t, jacK, jacM, ps, ts, jacKs, jacMs)
 #p, t, jacK, jacM =  ps, ts, jacKs, jacMs
 
 np, nt = size(p, 1), size(t, 1)
-ε = 1e-6
+ε = 1e-4
 x, dp = p, 2 * rand(size(p)...) .- 1
+Ib = unique(FemAdjoint.btri(t)[:])
+dp[Ib, :] .= 0.# fix Dirichlet points
 xp, xm = p .+ ε * dp, p .- ε * dp
 
 # finite differences
