@@ -94,3 +94,6 @@ include("test_costKproduv.jl")
 #-------------------------------------------------------------------------------
 # test adjoint approach for costnormU cost function
 include("test_costnormU.jl")
+#-------------------------------------------------------------------------------
+# test direct adjoint approach for costnormU cost function (definitely simpler!!)
+include("test_costnormU_direct.jl")
