@@ -5,7 +5,7 @@ using SparseArrays, SparseDiffTools, Symbolics
 # load mesh
 meshfile = "$(@__DIR__)/data/squaremesh.jld2"
 JLD2.@load(meshfile, p, t, ps, ts)
-p, t =  ps, ts
+#p, t =  ps, ts
 
 np, nt = size(p, 1), size(t, 1)
 ε = 1e-4
@@ -17,7 +17,8 @@ xp, xm = p .+ ε * dp, p .- ε * dp
 # finite differences
 f = x -> FemAdjoint.costnormU(x, t)
 fp, fm = f(xp), f(xm)
-@time g = FemAdjoint.∇costnormU_direct(x, t)
+@time g = FemAdjoint.∇costnormU_direct(x, t, plotsolutions = true)
+@time g = FemAdjoint.∇costnormU_direct(x, t, plotsolutions = false)
 println("")
 println(fp)
 println(fm)

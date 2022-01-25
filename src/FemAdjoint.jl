@@ -1,7 +1,7 @@
 module FemAdjoint
 
 using LinearAlgebra, StatsBase, GroupSlices
-using ForwardDiff, SparseDiffTools, SparseArrays, Symbolics
+using ForwardDiff, ReverseDiff, SparseDiffTools, SparseArrays, Symbolics
 using FileIO, JLD2, UnicodePlots
 
 include("assembly.jl")
@@ -86,7 +86,8 @@ function ∇costnormU(pin, t;
     return g
 end
 #-------------------------------------------------------------------------------
-function ∇costnormU_direct(pin, t)
+function ∇costnormU_direct(pin, t; 
+                           plotsolutions::Bool = false)
     p = if typeof(pin) <: Vector
         reshape(pin, length(pin) ÷ 2, 2)
     elseif typeof(pin) <: Matrix
@@ -105,32 +106,29 @@ function ∇costnormU_direct(pin, t)
     #F = ones(np)
     U = K \ F
     # plot
-    plotunicode(U,  title = "U")
+    plotsolutions && plotunicode(U,  title = "U")
     # cost gradient and adjoint function
     JFU = - 2 * U / np
     λ = K' \ JFU
-    plotunicode(λ, colormap = :plasma, title = "λ")
+    plotsolutions && plotunicode(λ, colormap = :plasma, title = "λ")
     # compute full gradient by automatic differentiation
-    ∇prodgrad = ForwardDiff.gradient(x -> prodgrad(x, t, U, λ), p)
+    #∇prodgrad = ForwardDiff.gradient(x -> prodgrad(x, t, U, λ), p)
+    ∇prodgrad = ReverseDiff.gradient(x -> prodgrad(x, t, U, λ), p)
     return ∇prodgrad
 end
 #-------------------------------------------------------------------------------
 function prodgrad(pin, t, U, λ)
-    p = if typeof(pin) <: Vector
-        reshape(pin, length(pin) ÷ 2, 2)
-    elseif typeof(pin) <: Matrix
-        pin
-    end
+    p = reshape(pin, length(pin) ÷ 2, 2)
     np = size(p, 1)
     # assemble matrices
     I, J = indKM_sparse(t)
     SK, SM = FemAdjoint.assembKM_P12D(p, t)
     val = 0.
     for (i, j, s) ∈ zip(I, J, SK)
-        val += λ[J[i]] * s * U[I[i]]
+        val += λ[i] * s * U[j]
     end
     for (i, j, s) ∈ zip(I, J, SM)
-        val -= λ[J[i]] * s 
+        val -= λ[i] * s 
     end
     return val
 end
