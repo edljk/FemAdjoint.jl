@@ -30,7 +30,7 @@ function costnormU(pin, t)
     val = sum(U[k] ^ 2 for k = 1:np) / np
     return val
 end
-
+#-------------------------------------------------------------------------------
 function ∇costnormU(pin, t;
                     jacK::SparseMatrixCSC{Float64, Int64} = spzeros(0, 0),
                     jacM::SparseMatrixCSC{Float64, Int64} = spzeros(0, 0))
@@ -84,6 +84,55 @@ function ∇costnormU(pin, t;
         g[j] -= λ[J[i]] * s 
     end
     return g
+end
+#-------------------------------------------------------------------------------
+function ∇costnormU_direct(pin, t)
+    p = if typeof(pin) <: Vector
+        reshape(pin, length(pin) ÷ 2, 2)
+    elseif typeof(pin) <: Matrix
+        pin
+    end
+    np = size(p, 1)
+    # assemble matrices
+    I, J = indKM_sparse(t)
+    SK, SM = FemAdjoint.assembKM_P12D(p, t)
+    K = sparse(I, J, SK, np, np)
+    Ib = unique(FemAdjoint.btri(t)[:])
+    K += sparse(Ib, Ib, fill(1e8, length(Ib)), np, np) # Dirichlet conditions
+    M = sparse(I, J, SM, np, np)
+    # compute state function
+    F = M * ones(np)
+    #F = ones(np)
+    U = K \ F
+    # plot
+    plotunicode(U,  title = "U")
+    # cost gradient and adjoint function
+    JFU = - 2 * U / np
+    λ = K' \ JFU
+    plotunicode(λ, colormap = :plasma, title = "λ")
+    # compute full gradient by automatic differentiation
+    ∇prodgrad = ForwardDiff.gradient(x -> prodgrad(x, t, U, λ), p)
+    return ∇prodgrad
+end
+#-------------------------------------------------------------------------------
+function prodgrad(pin, t, U, λ)
+    p = if typeof(pin) <: Vector
+        reshape(pin, length(pin) ÷ 2, 2)
+    elseif typeof(pin) <: Matrix
+        pin
+    end
+    np = size(p, 1)
+    # assemble matrices
+    I, J = indKM_sparse(t)
+    SK, SM = FemAdjoint.assembKM_P12D(p, t)
+    val = 0.
+    for (i, j, s) ∈ zip(I, J, SK)
+        val += λ[J[i]] * s * U[I[i]]
+    end
+    for (i, j, s) ∈ zip(I, J, SM)
+        val -= λ[J[i]] * s 
+    end
+    return val
 end
 
 end # module
